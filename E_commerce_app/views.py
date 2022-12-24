@@ -107,6 +107,7 @@ class MultiplefilterAPI(APIView, LimitOffsetPagination):
         Makeconditions = {}
         
         for Keys, Values in self.request.GET.items():
+
             if "category_name" in Keys:
 
                 new_cat = categories.objects.filter(
@@ -131,6 +132,27 @@ class MultiplefilterAPI(APIView, LimitOffsetPagination):
         new_serializer = category_list_serializer(results, many=True)
 
         return self.get_paginated_response(new_serializer.data)
+
+
+class SearchfilterAPI(APIView, LimitOffsetPagination):
+
+    def get(self, request):
+
+        searchconditions = {}
+        
+        for Keys, Values in self.request.GET.items():
+            
+            searchconditions[""+Keys+"__contains"]=Values
+            
+            
+        queryset = category_list.objects.filter(**searchconditions)
+
+        results = self.paginate_queryset(queryset, request, view=self)
+
+        new_serializer = category_list_serializer(results, many=True)
+
+        return self.get_paginated_response(new_serializer.data)
+
 
 
 @api_view(["GET"])
